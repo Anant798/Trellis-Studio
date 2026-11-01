@@ -719,9 +719,13 @@ kbd {
   display: grid;
   place-items: center;
   user-select: none;
-  cursor: grab;
+  cursor: default;
   min-height: 0;
   touch-action: none;
+}
+
+.editor-canvas-stage.has-image {
+  cursor: grab;
 }
 
 .editor-canvas-stage.is-panning {
@@ -1596,11 +1600,20 @@ kbd {
   color: #858995;
 }
 
-.file-card > button {
+.file-card > button, .file-card-action {
   border: 0;
   background: transparent;
   color: #727681;
   padding: 3px;
+  display: grid;
+  place-items: center;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+
+.file-card-action:hover {
+  color: var(--lime);
 }
 
 .file-card > button:hover {

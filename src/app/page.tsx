@@ -792,10 +792,19 @@ export default function Home() {
                                 <div className="ortho-empty">{view === "top" ? "Optional top view" : "Add " + view + " view"}</div>
                               )}
                               <div className="ortho-actions">
-                                <button type="button" onClick={() => viewPickers.current[view]?.click()}>
+                                <label className="ortho-choose-btn" style={{ cursor: "pointer" }}>
                                   <ImagePlus size={13} />
-                                  {selected ? "Replace" : "Choose image"}
-                                </button>
+                                  <span>{selected ? "Replace" : "Choose image"}</span>
+                                  <input
+                                    type="file"
+                                    accept="image/png,image/jpeg,image/webp"
+                                    style={{ display: "none" }}
+                                    onChange={event => {
+                                      chooseViewFile(view, event.target.files?.[0]);
+                                      event.currentTarget.value = "";
+                                    }}
+                                  />
+                                </label>
                                 {selected && (
                                   <button
                                     type="button"
@@ -979,6 +988,22 @@ export default function Home() {
                                     : `${(image.size / 1024 / 1024).toFixed(2)} MB · ${image.name.split(".").pop()?.toUpperCase()}`}
                                 </span>
                               </div>
+                              <label
+                                className="file-card-action"
+                                title="Replace reference image"
+                                style={{ cursor: "pointer" }}
+                              >
+                                <ImagePlus size={14} />
+                                <input
+                                  type="file"
+                                  accept="image/png,image/jpeg,image/webp"
+                                  style={{ display: "none" }}
+                                  onChange={e => {
+                                    chooseFile(e.target.files?.[0]);
+                                    e.currentTarget.value = "";
+                                  }}
+                                />
+                              </label>
                               <button
                                 type="button"
                                 title="Remove image"
@@ -994,9 +1019,18 @@ export default function Home() {
                               </button>
                             </div>
                           ) : (
-                            <button type="button" className="add-reference" onClick={() => picker.current?.click()}>
+                            <label className="add-reference" style={{ cursor: "pointer" }}>
                               <Plus size={14} /> Add a reference image
-                            </button>
+                              <input
+                                type="file"
+                                accept="image/png,image/jpeg,image/webp"
+                                style={{ display: "none" }}
+                                onChange={e => {
+                                  chooseFile(e.target.files?.[0]);
+                                  e.currentTarget.value = "";
+                                }}
+                              />
+                            </label>
                           )
                         ) : (
                           <div className="view-file-list">

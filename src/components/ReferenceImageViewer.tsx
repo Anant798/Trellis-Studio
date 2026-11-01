@@ -69,7 +69,6 @@ export default function ReferenceImageViewer({
 }: ReferenceImageViewerProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const imageRef = useRef<HTMLImageElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Preview adjustments state (pan, zoom, rotation)
   const [zoom, setZoom] = useState(1);
@@ -163,7 +162,7 @@ export default function ReferenceImageViewer({
 
   // Pointer event handlers for panning
   const handlePointerDownCanvas = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (isCropping) return;
+    if (!image || isCropping) return;
     // Only drag with primary pointer
     if (e.button !== 0) return;
     setIsPanning(true);
@@ -177,7 +176,7 @@ export default function ReferenceImageViewer({
   };
 
   const handlePointerMoveCanvas = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isPanning || isCropping) return;
+    if (!image || !isPanning || isCropping) return;
     const dx = e.clientX - dragStartRef.current.x;
     const dy = e.clientY - dragStartRef.current.y;
     setPan({
@@ -445,14 +444,22 @@ export default function ReferenceImageViewer({
 
             <div className="toolbar-divider" />
 
-            <button
-              type="button"
+            <label
               className="toolbar-btn"
               title="Replace reference image"
-              onClick={() => fileInputRef.current?.click()}
+              style={{ cursor: "pointer" }}
             >
               <ImagePlus size={13} />
-            </button>
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                style={{ display: "none" }}
+                onChange={e => {
+                  onSelectFile(e.target.files?.[0]);
+                  e.currentTarget.value = "";
+                }}
+              />
+            </label>
 
             <button
               type="button"
@@ -502,16 +509,46 @@ export default function ReferenceImageViewer({
       {/* Main Canvas Viewport Area */}
       <div
         className={`editor-canvas-stage ${isPanning ? "is-panning" : ""} ${image ? "has-image" : ""}`}
-        onPointerDown={handlePointerDownCanvas}
-        onPointerMove={handlePointerMoveCanvas}
-        onPointerUp={handlePointerUpCanvas}
+        onPointerDown={image && !isCropping ? handlePointerDownCanvas : undefined}
+        onPointerMove={image && !isCropping ? handlePointerMoveCanvas : undefined}
+        onPointerUp={image && !isCropping ? handlePointerUpCanvas : undefined}
       >
         {!image ? (
-          <button
-            type="button"
+          <label
             className={`dropzone-editor ${draggingFile ? "dragging" : ""}`}
-            onClick={() => fileInputRef.current?.click()}
+            style={{ cursor: "pointer" }}
+            onDragOver={e => {
+              e.preventDefault();
+              e.stopPropagation();
+              setDraggingFile(true);
+            }}
+            onDragEnter={e => {
+              e.preventDefault();
+              e.stopPropagation();
+              setDraggingFile(true);
+            }}
+            onDragLeave={e => {
+              e.preventDefault();
+              e.stopPropagation();
+              setDraggingFile(false);
+            }}
+            onDrop={e => {
+              e.preventDefault();
+              e.stopPropagation();
+              setDraggingFile(false);
+              const file = e.dataTransfer.files?.[0];
+              if (file) onSelectFile(file);
+            }}
           >
+            <input
+              type="file"
+              accept="image/png,image/jpeg,image/webp"
+              style={{ display: "none" }}
+              onChange={e => {
+                onSelectFile(e.target.files?.[0]);
+                e.currentTarget.value = "";
+              }}
+            />
             <div className="drop-orbit">
               <div className="orbit-ring ring-a" />
               <div className="orbit-ring ring-b" />
@@ -534,7 +571,7 @@ export default function ReferenceImageViewer({
             <span className="drag-hint">
               <Upload size={12} /> RELEASE TO UPLOAD
             </span>
-          </button>
+          </label>
         ) : (
           <div className="canvas-interactive-wrapper">
             <div
@@ -658,18 +695,6 @@ export default function ReferenceImageViewer({
           )}
         </div>
       </div>
-
-      {/* Hidden file input */}
-      <input
-        ref={fileInputRef}
-        type="file"
-        accept="image/png,image/jpeg,image/webp"
-        hidden
-        onChange={e => {
-          onSelectFile(e.target.files?.[0]);
-          e.currentTarget.value = "";
-        }}
-      />
     </div>
   );
 }
