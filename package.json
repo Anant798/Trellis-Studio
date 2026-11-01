@@ -8,7 +8,7 @@
     "start": "next start --hostname 127.0.0.1",
     "lint": "eslint src next.config.ts eslint.config.mjs postcss.config.mjs",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test src/server/generation.test.ts src/components/material-preview.test.ts"
+    "test": "tsx --test src/server/generation.test.ts src/components/material-preview.test.ts src/components/reference-image.test.ts"
   },
   "dependencies": {
     "@react-three/drei": "^10.7.9",
