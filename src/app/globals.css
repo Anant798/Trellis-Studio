@@ -1945,7 +1945,7 @@ kbd {
   padding-top: 8px;
 }
 
-.ortho-actions button, .view-file-row button {
+.ortho-actions button, .view-file-row button, .view-file-action {
   display: inline-flex;
   align-items: center;
   gap: 4px;

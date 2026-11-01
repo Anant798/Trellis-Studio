@@ -49,8 +49,7 @@ type ViewName = "front" | "back" | "left" | "right" | "top";
 type ViewSelection = { url: string; name: string; size: number; file: File };
 
 export default function Home() {
-  const picker = useRef<HTMLInputElement>(null);
-  const viewPickers = useRef<Partial<Record<ViewName, HTMLInputElement | null>>>({});
+  /* File picker refs removed — now using native <label> + <input type="file"> */
 
   // Reference image state (active image, original uploaded image, and applied crop)
   const [image, setImage] = useState<ImageFileInfo | null>(null);
@@ -768,18 +767,6 @@ export default function Home() {
                           const required = view === "front";
                           return (
                             <div className="orthographic-card" key={view}>
-                              <input
-                                ref={element => {
-                                  viewPickers.current[view] = element;
-                                }}
-                                type="file"
-                                accept="image/png,image/jpeg,image/webp"
-                                hidden
-                                onChange={event => {
-                                  chooseViewFile(view, event.target.files?.[0]);
-                                  event.currentTarget.value = "";
-                                }}
-                              />
                               <div className="ortho-label">
                                 {view.toUpperCase()}{" "}
                                 <small>{required ? "REQUIRED" : view === "top" ? "OPTIONAL" : "OPTIONAL"}</small>
@@ -1043,14 +1030,32 @@ export default function Home() {
                                     <>
                                       <img src={item.url} alt="" />
                                       <strong title={item.name}>{item.name}</strong>
-                                      <button type="button" onClick={() => viewPickers.current[view]?.click()}>
+                                      <label className="view-file-action" style={{ cursor: "pointer" }}>
                                         Replace
-                                      </button>
+                                        <input
+                                          type="file"
+                                          accept="image/png,image/jpeg,image/webp"
+                                          style={{ display: "none" }}
+                                          onChange={e => {
+                                            chooseViewFile(view, e.target.files?.[0]);
+                                            e.currentTarget.value = "";
+                                          }}
+                                        />
+                                      </label>
                                     </>
                                   ) : (
-                                    <button type="button" onClick={() => viewPickers.current[view]?.click()}>
+                                    <label className="view-file-action" style={{ cursor: "pointer" }}>
                                       Add {view}
-                                    </button>
+                                      <input
+                                        type="file"
+                                        accept="image/png,image/jpeg,image/webp"
+                                        style={{ display: "none" }}
+                                        onChange={e => {
+                                          chooseViewFile(view, e.target.files?.[0]);
+                                          e.currentTarget.value = "";
+                                        }}
+                                      />
+                                    </label>
                                   )}
                                 </div>
                               );
@@ -1240,17 +1245,6 @@ export default function Home() {
             </button>
           </footer>
         </div>
-
-        <input
-          ref={picker}
-          type="file"
-          accept="image/png,image/jpeg,image/webp"
-          hidden
-          onChange={e => {
-            chooseFile(e.target.files?.[0]);
-            e.currentTarget.value = "";
-          }}
-        />
 
         {error && (
           <div className="error-toast" role="alert">
